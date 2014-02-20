@@ -4,7 +4,7 @@ $LOAD_PATH.push File.expand_path(File.dirname(__FILE__))
 # to all of the configuration options.
 module Jammit
 
-  VERSION                       = "0.6.6"
+  VERSION                       = "0.6.7"
 
   ROOT                          = File.expand_path(File.dirname(__FILE__) + '/..')
 
@@ -24,11 +24,11 @@ module Jammit
 
   JAVASCRIPT_COMPRESSORS        = [:jsmin, :yui, :closure, :uglifier]
 
-  DEFAULT_JAVASCRIPT_COMPRESSOR = :jsmin
+  DEFAULT_JAVASCRIPT_COMPRESSOR = :yui
 
   CSS_COMPRESSORS               = [:cssmin, :yui, :sass]
 
-  DEFAULT_CSS_COMPRESSOR        = :cssmin
+  DEFAULT_CSS_COMPRESSOR        = :yui
 
   # Extension matchers for JavaScript and JST, which need to be disambiguated.
   JS_EXTENSION          = /\.js\Z/
@@ -52,12 +52,12 @@ module Jammit
 
   class << self
     attr_reader   :configuration, :template_function, :template_namespace,
-                  :embed_assets, :package_assets, :compress_assets, :gzip_assets,
-                  :package_path, :mhtml_enabled, :include_jst_script, :config_path,
-                  :javascript_compressor, :compressor_options, :css_compressor,
-                  :css_compressor_options, :template_extension,
-                  :template_extension_matcher, :allow_debugging,
-                  :rewrite_relative_paths, :public_root
+      :embed_assets, :package_assets, :compress_assets, :gzip_assets,
+      :package_path, :mhtml_enabled, :include_jst_script, :config_path,
+      :javascript_compressor, :compressor_options, :css_compressor,
+      :css_compressor_options, :template_extension,
+      :template_extension_matcher, :allow_debugging,
+      :rewrite_relative_paths, :public_root
     attr_accessor :javascript_compressors, :css_compressors
   end
 
@@ -170,13 +170,13 @@ module Jammit
   def self.set_package_assets(value)
     package_env     = !defined?(Rails) || (!Rails.env.development? && !Rails.env.test?)
     @package_assets = value == true || value.nil? ? package_env :
-                      value == 'always'           ? true : false
+      value == 'always'           ? true : false
   end
 
   # Assign the JST template function, unless explicitly turned off.
   def self.set_template_function(value)
     @template_function = value == true || value.nil? ? DEFAULT_JST_COMPILER :
-                         value == false              ? '' : value
+      value == false              ? '' : value
     @include_jst_script = @template_function == DEFAULT_JST_COMPILER
   end
 
