@@ -1,5 +1,4 @@
 module Jammit
-
   # Uses the YUI Compressor or Closure Compiler to compress JavaScript.
   # Always uses YUI to compress CSS (Which means that Java must be installed.)
   # Also knows how to create a concatenated JST file.
@@ -52,7 +51,7 @@ module Jammit
       :cssmin   => Jammit.css_compressors.include?(:cssmin) ? Jammit::CssminCompressor : nil,
       :yui      => Jammit.css_compressors.include?(:yui) ? YUI::CssCompressor : nil,
       :sass     => Jammit.css_compressors.include?(:sass) ? Jammit::SassCompressor : nil
-     }
+    }
 
     JAVASCRIPT_DEFAULT_OPTIONS = {
       :jsmin    => {},
@@ -69,11 +68,25 @@ module Jammit
         Jammit.check_java_version
       end
 
-      css_flavor      = Jammit.css_compressor || Jammit::DEFAULT_CSS_COMPRESSOR
-      @css_compressor = CSS_COMPRESSORS[css_flavor].new(Jammit.css_compressor_options || {})
-      js_flavor       = Jammit.javascript_compressor || Jammit::DEFAULT_JAVASCRIPT_COMPRESSOR
-      @options        = JAVASCRIPT_DEFAULT_OPTIONS[js_flavor].merge(Jammit.compressor_options || {})
-      @js_compressor  = JAVASCRIPT_COMPRESSORS[js_flavor].new(@options)
+      # css_flavor      = Jammit.css_compressor || Jammit::DEFAULT_CSS_COMPRESSOR
+      # @css_compressor = CSS_COMPRESSORS[css_flavor].new(Jammit.css_compressor_options || {})
+      # js_flavor       = Jammit.javascript_compressor || Jammit::DEFAULT_JAVASCRIPT_COMPRESSOR
+      # @options        = JAVASCRIPT_DEFAULT_OPTIONS[js_flavor].merge(Jammit.compressor_options || {})
+      # @js_compressor  = JAVASCRIPT_COMPRESSORS[js_flavor].new(@options)
+
+      @css_compressor = CSS_COMPRESSORS[Jammit.css_compressor || Jammit::DEFAULT_CSS_COMPRESSOR].new(Jammit.css_compressor_options || {})
+
+      @options        = JAVASCRIPT_DEFAULT_OPTIONS[Jammit.javascript_compressor || Jammit::DEFAULT_JAVASCRIPT_COMPRESSOR].merge(Jammit.compressor_options || {})
+
+      # @js_compressor  = JAVASCRIPT_COMPRESSORS[Jammit.javascript_compressor || Jammit::DEFAULT_JAVASCRIPT_COMPRESSOR].new({
+      #                                                                                                                       :munge => true
+      # })
+      @js_compressor  = Jammit::Uglifier.new({
+                                               :output => {
+                                                 :comments => :none
+                                               },
+                                               :mangle => true
+      })
     end
 
     # Concatenate together a list of JavaScript paths, and pass them through the
@@ -84,7 +97,7 @@ module Jammit
       else
         js = concatenate(paths - jst_paths) + compile_jst(jst_paths)
       end
-      Jammit.compress_assets ? @js_compressor.compress(js) : js
+      Jammit.compress_assets ? @js_compressor.compile(js) : js
     end
 
     # Concatenate and compress a list of CSS stylesheets. When compressing a
@@ -200,8 +213,8 @@ module Jammit
     # not be relative, given the path of the stylesheet that contains it.
     def absolute_path(asset_pathname, css_pathname)
       (asset_pathname.absolute? ?
-        Pathname.new(File.join(Jammit.public_root, asset_pathname)) :
-        css_pathname.dirname + asset_pathname).cleanpath
+       Pathname.new(File.join(Jammit.public_root, asset_pathname)) :
+       css_pathname.dirname + asset_pathname).cleanpath
     end
 
     # CSS assets that are referenced by relative paths, and are *not* being

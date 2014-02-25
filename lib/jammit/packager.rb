@@ -1,5 +1,4 @@
 module Jammit
-
   # The Jammit::Packager resolves the configuration file into lists of real
   # assets that get merged into individual asset packages. Given the compiled
   # contents of an asset package, the Packager knows how to cache that package
@@ -81,6 +80,7 @@ module Jammit
 
     # Return the compressed contents of a javascript package.
     def pack_javascripts(package)
+      puts "\e[33m packaging #{package} compressing javascript....\e[0m"
       compressor.compress_js(package_for(package, :js)[:paths])
     end
 
@@ -108,7 +108,7 @@ module Jammit
       paths
     end
 
-    # In Rails, the difference between a path and an asset URL is "public".    
+    # In Rails, the difference between a path and an asset URL is "public".
     def path_to_url
       @path_to_url ||= /\A#{Regexp.escape(ASSET_ROOT)}(\/?#{Regexp.escape(Jammit.public_root.sub(ASSET_ROOT, ''))})?/
     end
