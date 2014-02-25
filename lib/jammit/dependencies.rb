@@ -8,28 +8,27 @@ require 'pathname'
 require 'fileutils'
 
 # Try Uglifier.
-# begin
-require 'jammit/uglifier'
-#   require 'jammit/uglifier'
-# rescue LoadError
-#   Jammit.javascript_compressors.delete :uglifier
-# end
+begin
+  require 'jammit/uglifier'
+rescue LoadError
+  Jammit.javascript_compressors.delete :uglifier
+end
 
 # Try YUI
-# begin
-#   require 'yui/compressor'
-# rescue LoadError
-#   Jammit.javascript_compressors.delete :yui
-#   Jammit.css_compressors.delete :yui
-# end
-require 'yui/compressor'
+begin
+  require 'yui/compressor'
+rescue LoadError
+  Jammit.javascript_compressors.delete :yui
+  Jammit.css_compressors.delete :yui
+end
+
 
 # Try Closure.
-# begin
-require 'closure/compiler'
-# rescue LoadError
-#   Jammit.javascript_compressors.delete :closure
-# end
+begin
+  require 'closure/compiler'
+rescue LoadError
+  Jammit.javascript_compressors.delete :closure
+end
 
 # Try Sass
 begin
